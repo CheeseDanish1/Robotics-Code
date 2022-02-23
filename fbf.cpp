@@ -27,10 +27,14 @@ brain Brain;
 
 
 // Robot configuration code.
+controller Controller1 = controller(primary);
 motor Motor1 = motor(PORT1, ratio6_1, false);
 
-controller Controller1 = controller(primary);
-motor Motor2 = motor(PORT2, ratio6_1, false);
+motor Motor2 = motor(PORT11, ratio6_1, false);
+
+motor Motor10 = motor(PORT10, ratio6_1, false);
+
+motor Motor9 = motor(PORT9, ratio18_1, false);
 
 
 // define variable for remote controller enable/disable
@@ -51,10 +55,6 @@ const int MOVING_MULTIPLIER = 6;
 // Motor 1 is the right motor
 // Motor 2 is the left motor
 
-void stopMove() {
-  Motor1.stop();
-}
-
 void start() {
   Brain.Screen.clearLine(1);
   Brain.Screen.clearScreen();
@@ -64,8 +64,10 @@ void start() {
 void MoveRightMotor() {
   int pos = Controller1.Axis2.position();
   int a = ABS(pos)*MOVING_MULTIPLIER;
-  Motor1.setVelocity(a, rpm);
-  Motor1.spin(pos > 0 ? forward : reverse);
+  Motor2.setVelocity(a, rpm);
+  Motor2.spin(pos > 0 ? reverse : forward);
+  Motor10.setVelocity(a, rpm);
+  Motor10.spin(pos > 0 ? reverse : forward);
 }
 
 void MoveLeftMotor() {
@@ -73,11 +75,13 @@ void MoveLeftMotor() {
   int a = ABS(pos)*MOVING_MULTIPLIER;
   Motor1.setVelocity(a, rpm);
   Motor1.spin(pos > 0 ? forward : reverse);
+  Motor9.setVelocity(a, rpm);
+  Motor9.spin(pos > 0 ? forward : reverse);
 }
 
 int whenStarted1() {
   start();
-  Controller1.Axis3.changed(MoveLeftMotor)
+  Controller1.Axis3.changed(MoveLeftMotor);
   Controller1.Axis2.changed(MoveRightMotor);
   return 0;
 }
