@@ -31,9 +31,9 @@ motor Motor3 = motor(PORT3, ratio18_1, false);
 
 motor Motor4 = motor(PORT7, ratio6_1, false);
 
-motor Motor9 = motor(PORT9, ratio18_1, false);
+motor Motor9 = motor(PORT20, ratio18_1, false);
 
-motor Motor10 = motor(PORT20, ratio18_1, false);
+motor Motor10 = motor(PORT1, ratio18_1, false);
 
 motor Motor20 = motor(PORT10, ratio18_1, false);
 
@@ -74,6 +74,13 @@ Any printBrain(Any val) {
 void MoveMotors(int pos, int pos2) {
   int a = ABS(pos)*MOVING_MULTIPLIER;
   int a2 = ABS(pos2)*MOVING_MULTIPLIER;
+
+  if (pos == 0 && pos2 == 0) {
+    Motor20.stop();
+    Motor19.stop();
+    Motor10.stop();
+    Motor9.stop();
+  }
 
   Motor20.setVelocity(a, rpm);
   Motor20.spin(pos < 0 ? forward : reverse);
@@ -154,6 +161,10 @@ void initClamp() {
 }
 
 void initStearing() {
+  Motor20.setStopping(brake);
+  Motor19.setStopping(brake);
+  Motor10.setStopping(brake);
+  Motor9.setStopping(brake);
   Controller1.Axis3.changed(assessMovement);
   Controller1.Axis4.changed(assessMovement);
 }
