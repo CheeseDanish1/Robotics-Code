@@ -103,11 +103,11 @@ void moveForwards(int inchess) {
   Motor10.setVelocity(speed, rpm);
   Motor9.setVelocity(speed, rpm);
 
-  int rps = 10;
+  int rps = speed/60;
   // 1 second there is 10 rotations and each rotation covers 4 pi inches 
   // 1 second there is 10 * 4 pi inches covered
   // 1 second / 10*4pi = x/inchess
-  float rotateFor = inchess/10*4*3.1415926535897932384626433
+  float rotateFor = inchess/(rps*4*3.1415926535897932384626433)
 
   Motor20.spin(forward);
   Motor19.spin(forward);
