@@ -119,12 +119,12 @@ Motor4.stop();
 }
 
 void startBand() {
-  Motor8.setVelocity(100, rpm);
+  Motor8.setVelocity(500, rpm);
   Motor8.spin(forward);
 }
 
 void reverseBand() {
-  Motor8.setVelocity(100, rpm);
+  Motor8.setVelocity(500, rpm);
   Motor8.spin(reverse);
 }
 
