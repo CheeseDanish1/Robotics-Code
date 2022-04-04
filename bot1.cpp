@@ -117,12 +117,10 @@ Motor5.stop();
 }
 
 void startBand() {
-  Motor8.setVelocity(400, rpm);
   Motor8.spin(forward);
 }
 
 void reverseBand() {
-  Motor8.setVelocity(400, rpm);
   Motor8.spin(reverse);
 }
 
@@ -131,6 +129,8 @@ void stopBand() {
 }
 
 void initBand() {
+  Motor8.setVelocity(550, rpm);
+
   Controller1.ButtonR1.pressed(startBand);
   Controller1.ButtonR1.released(stopBand);
   Controller1.ButtonR2.pressed(reverseBand);
