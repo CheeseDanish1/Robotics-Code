@@ -127,8 +127,8 @@ Motor20.spin(reverse);
 }
 
 void initFliger() {
-  Motor20.setMaxTorque(100, percent);
-  Motor20.setVelocity(9001, rpm);
+  // Motor20.setMaxTorque(100000, percent);+
+  Motor20.setVelocity(20, rpm);
   Motor20.setStopping(hold);
   Controller1.ButtonR1.pressed(flingerUp);
   Controller1.ButtonR1.released(stopFlinger);
