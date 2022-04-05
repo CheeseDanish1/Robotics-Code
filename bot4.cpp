@@ -48,7 +48,7 @@ brain Brain;
 // Allows for easier use of the VEX Library
 using namespace vex;
 
-int MOVING_MULTIPLIER = 8;
+int MOVING_MULTIPLIER = 2;
 
 controller Controller1 = controller(primary);
 motor Motor1 = motor(PORT11, ratio6_1, false);
@@ -72,8 +72,8 @@ Any printSpeed(Any one, Any two) {
 }
 
 void MoveMotors(int pos, int pos2) {
-  int a = ABS(pos2)*MOVING_MULTIPLIER;
-  int a2 = ABS(pos)*MOVING_MULTIPLIER;
+  int a = ABS(pos2)*8;
+  int a2 = ABS(pos)*8;
 
   if (pos == 0 && pos2 == 0) {
     Motor1.stop();
@@ -84,13 +84,13 @@ void MoveMotors(int pos, int pos2) {
 
   printSpeed(pos*MOVING_MULTIPLIER, pos2*MOVING_MULTIPLIER);
 
-  Motor1.setVelocity(a, rpm);
+  Motor1.setVelocity(a2, rpm);
   Motor1.spin(pos < 0 ? forward : reverse);
-  Motor2.setVelocity(a, rpm);
+  Motor2.setVelocity(a2, rpm);
   Motor2.spin(pos < 0 ? forward : reverse);
-  Motor3.setVelocity(a2, rpm);
+  Motor3.setVelocity(a, rpm);
   Motor3.spin(pos2 < 0 ? reverse : forward);
-  Motor4.setVelocity(a2, rpm);
+  Motor4.setVelocity(a, rpm);
   Motor4.spin(pos2 < 0 ? reverse : forward);
 }
 
@@ -107,10 +107,10 @@ void assessMovement() {
 }
 
 void initStearing() {
-  Motor1.setStopping(coast);
-  Motor2.setStopping(coast);
-  Motor3.setStopping(coast);
-  Motor4.setStopping(coast);
+  Motor1.setStopping(brake);
+  Motor2.setStopping(brake);
+  Motor3.setStopping(brake);
+  Motor4.setStopping(brake);
   Controller1.Axis2.changed(assessMovement);
   Controller1.Axis1.changed(assessMovement);
 }
@@ -127,7 +127,7 @@ Motor20.spin(reverse);
 }
 
 void initFliger() {
-  // Motor20.setMaxTorque(100000, percent);+
+  // Motor20.setMaxTorque(100000, percent);
   Motor20.setVelocity(20, rpm);
   Motor20.setStopping(hold);
   Controller1.ButtonR1.pressed(flingerUp);
