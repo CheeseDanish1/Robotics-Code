@@ -62,7 +62,7 @@ bool RemoteControlCodeEnabled = true;
 using namespace vex;
 
 int MOVING_MULTIPLIER = 8;
-
+int isClampOpen = true;
 template<class Any>
 Any printSpeed(Any one, Any two) { 
   Brain.Screen.clearLine(1);
@@ -70,6 +70,14 @@ Any printSpeed(Any one, Any two) {
   Brain.Screen.print(two); 
   Brain.Screen.print("  "); 
   Brain.Screen.print(one); 
+  return 0; 
+}
+template<class Any>
+
+Any printBrain(Any text) { 
+  Brain.Screen.clearLine(1);
+  Brain.Screen.clearScreen();
+  Brain.Screen.print(text); 
   return 0; 
 }
 
@@ -116,6 +124,30 @@ void initStearing() {
   Controller1.Axis3.changed(assessMovement);
   Controller1.Axis4.changed(assessMovement);
 }
+
+void clamp() {
+  if (isClampOpen) {
+    Motor7.spin(reverse);
+    wait(.25, seconds);
+    isClampOpen = false;
+    Motor7.stop();
+  } else {
+    // printBrain("Clamp Opening");
+    Motor7.spin(forward);
+    wait(.25, seconds);
+    isClampOpen = true;
+    Motor7.stop();
+
+  }
+}
+
+void initClamp() {
+  Motor7.setVelocity(800,rpm);
+  Motor7.setStopping(hold);
+  Controller1.ButtonA.pressed(clamp);
+}
+
 int main() {
   initStearing();
+  initClamp();
 }
