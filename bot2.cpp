@@ -27,166 +27,144 @@ brain Brain;
 
 
 // Robot configuration code.
-motor Motor3 = motor(PORT3, ratio18_1, false);
+motor Motor2 = motor(PORT2, ratio18_1, false);
 
-motor Motor4 = motor(PORT7, ratio6_1, false);
+motor Motor10 = motor(PORT10, ratio18_1, false);
 
-motor Motor9 = motor(PORT20, ratio18_1, false);
+motor Motor11 = motor(PORT11, ratio18_1, false);
 
-motor Motor10 = motor(PORT1, ratio18_1, false);
-
-motor Motor20 = motor(PORT10, ratio18_1, false);
-
-motor Motor19 = motor(PORT2, ratio18_1, false);
+motor Motor20 = motor(PORT20, ratio18_1, false);
 
 controller Controller1 = controller(primary);
-motor Motor8 = motor(PORT8, ratio18_1, false);
+motor Roller = motor(PORT19, ratio18_1, false);
+
+motor Expand = motor(PORT3, ratio18_1, false);
+
+
 
 
 // define variable for remote controller enable/disable
 bool RemoteControlCodeEnabled = true;
-
-
-
-
 #pragma endregion VEXcode Generated Robot Configuration
 
+/*----------------------------------------------------------------------------*/
+/*                                                                            */
+/*    Module:       main.cpp                                                  */
+/*    Author:       {author}                                                  */
+/*    Created:      {date}                                                    */
+/*    Description:  V5 project                                                */
+/*                                                                            */
+/*----------------------------------------------------------------------------*/
+
+// Include the V5 Library
 #include "vex.h"
-#define ABS(N) ((N<0)?(-N):(N))
-// Allows for easier use of the VEX Library
-using namespace vex;
+#define ABS(N)((N < 0) ? (-N) : (N))
 
-const int MOVING_MULTIPLIER = 6;
-const int clampVelocity = 200;
-// bool band = false;
-// Motor 1 and 9 are the right motors and are ports 10 and 9
-// Motor 2 and 10 are the left motors and are port 19 and 20
-// Motor 3 is the spinny band and goes to port 11
+const int MOVING_MULTIPLIER = 10;
+bool BRAKE_ENABLED = true;
 
-template<class Any>
-Any printBrain(Any val) { 
-  Brain.Screen.clearLine(1);
-  Brain.Screen.clearScreen();
-  Brain.Screen.print(val); 
-  return val; 
-}
-
-void MoveMotors(int pos, int pos2) {
-  int a = ABS(pos)*MOVING_MULTIPLIER;
-  int a2 = ABS(pos2)*MOVING_MULTIPLIER;
-
-  if (pos == 0 && pos2 == 0) {
-    Motor20.stop();
-    Motor19.stop();
-    Motor10.stop();
-    Motor9.stop();
+template < class Any >
+  Any printBrain(Any val, bool clear2) {
+    if (clear2) {
+      Brain.Screen.clearLine(1);
+      Brain.Screen.clearScreen();
+    } else {
+      Brain.Screen.newLine();
+    }
+    Brain.Screen.print(val);
+    return val;
   }
 
-  Motor20.setVelocity(a, rpm);
-  Motor20.spin(pos < 0 ? forward : reverse);
-  Motor19.setVelocity(a, rpm);
-  Motor19.spin(pos < 0 ? forward : reverse);
+void MoveMotors(int pos, int pos2) {
+  int a = ABS(pos) * MOVING_MULTIPLIER;
+  int a2 = ABS(pos2) * MOVING_MULTIPLIER;
+
+  Motor2.setVelocity(a, rpm);
+  Motor11.setVelocity(a, rpm);
   Motor10.setVelocity(a2, rpm);
-  Motor10.spin(pos2 < 0 ? reverse : forward);
-  Motor9.setVelocity(a2, rpm);
-  Motor9.spin(pos2 < 0 ? reverse : forward);
+  Motor20.setVelocity(a2, rpm);
+  Motor2.spin(pos > 0 ? forward : reverse);
+  Motor11.spin(pos > 0 ? forward : reverse);
+  Motor10.spin(pos2 > 0 ? reverse : forward);
+  Motor20.spin(pos2 > 0 ? reverse : forward);
 }
 
 void assessMovement() {
   // This is for turning (-100, 100)
   // Corresponds to x axis
-  int pos1 = Controller1.Axis4.position();
+  int pos1 = Controller1.Axis1.position();
   // This is for speed(-100, 100)
   // Corresponds to y axis
-  int pos2 = Controller1.Axis3.position();
-  
+  int pos2 = Controller1.Axis2.position();
+
   // Dont know why this works but im glad I found it
-  MoveMotors(pos2-pos1, pos2+pos1);
-}
-
-void clampDown() {
-  Motor4.setVelocity(clampVelocity, rpm);
-  Motor4.spin(reverse);
-}
-
-void clampUp() {
-  Motor4.setVelocity(clampVelocity, rpm);
-  Motor4.spin(forward );
-}
-
-void clampStop() {
-Motor4.stop();
-}
-
-void startBand() {
-  Motor8.setVelocity(500, rpm);
-  Motor8.spin(forward);
-}
-
-void reverseBand() {
-  Motor8.setVelocity(500, rpm);
-  Motor8.spin(reverse);
-}
-
-void stopBand() {
-  Motor8.stop();
-}
-
-void guiderStop() {
-  Motor3.stop();
-}
-void guiderUp() {
-  Motor3.setVelocity(75, rpm);
-  Motor3.spin(forward);
-}
-
-void guiderDown() {
-  Motor3.setVelocity(75, rpm);
-  Motor3.spin(reverse);
-}
-
-void initBand() {
-  Controller1.ButtonR1.pressed(startBand);
-  Controller1.ButtonR1.released(stopBand);
-  Controller1.ButtonR2.pressed(reverseBand);
-  Controller1.ButtonR2.released(stopBand);
-}
-
-void initClamp() {
-  Controller1.ButtonB.pressed(clampDown);
-  Controller1.ButtonB.released(clampStop);
-  Controller1.ButtonX.pressed(clampUp);
-  Controller1.ButtonX.released(clampStop);
-
+  MoveMotors(pos2 + pos1, pos2 - pos1);
 }
 
 void initStearing() {
-  Motor20.setStopping(brake);
-  Motor19.setStopping(brake);
-  Motor10.setStopping(brake);
-  Motor9.setStopping(brake);
-  Controller1.Axis3.changed(assessMovement);
-  Controller1.Axis4.changed(assessMovement);
-}
+  printBrain("Stearing ready", false);
 
-void initGuider() {
-  Controller1.ButtonL1.pressed(guiderDown);
-  Controller1.ButtonL1.released(guiderStop);
-  Controller1.ButtonL2.pressed(guiderUp);
-  Controller1.ButtonL2.released(guiderStop);
+  if (BRAKE_ENABLED) {
+    Motor2.setStopping(brake);
+    Motor10.setStopping(brake);
+    Motor11.setStopping(brake);
+    Motor20.setStopping(brake);
+  }
+
+  Controller1.Axis2.changed(assessMovement);
+  Controller1.Axis1.changed(assessMovement);
 }
 
 void onStart() {
-  printBrain("Hewwo UwU :3");
+  printBrain("Hewwo UwU :3", true);
   Controller1.rumble(rumblePulse);
 }
 
+void rollerBackward() {
+  Roller.spin(forward);
+}
+
+void rollerForward() {
+  Roller.spin(reverse);
+}
+
+void rollerStop() {
+  Roller.stop();
+}
+
+void initRoller() {
+  Roller.setVelocity(100, percent);
+  Controller1.ButtonR2.pressed(rollerForward);
+  Controller1.ButtonR1.pressed(rollerBackward);
+  Controller1.ButtonR1.released(rollerStop);
+  Controller1.ButtonR2.released(rollerStop);
+}
+
+void expand() {
+  Expand.spin(reverse);
+  wait(2, seconds);
+  Expand.stop();
+  printBrain("Expantion", false);
+}
+
+void expandCheck() {
+  printBrain("Checked", true);
+  int downPressed = Controller1.ButtonRight.pressing();
+  int upPressed = Controller1.ButtonLeft.pressing();
+  if (downPressed && upPressed) {
+    expand();
+  }
+}
+
+void initExpansion() {
+  printBrain("Started", false);
+  Controller1.ButtonRight.pressed(expandCheck);
+  Controller1.ButtonLeft.pressed(expandCheck);
+}
+
 int main() {
-  Motor4.setStopping(hold);
-  Motor3.setStopping(hold);
   onStart();
-  initBand();
   initStearing();
-  initClamp();
-  initGuider();
+  initRoller();  
+  initExpansion();
 }
