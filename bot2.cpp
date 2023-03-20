@@ -92,13 +92,13 @@ void MoveMotors(int pos, int pos2) {
 void assessMovement() {
   // This is for turning (-100, 100)
   // Corresponds to x axis
-  int pos1 = Controller1.Axis1.position();
+  int pos1 = Controller1.Axis3.position();
   // This is for speed(-100, 100)
   // Corresponds to y axis
   int pos2 = Controller1.Axis2.position();
 
   // Dont know why this works but im glad I found it
-  MoveMotors(pos2 + pos1, pos2 - pos1);
+  MoveMotors(pos1, pos2);
 }
 
 void initStearing() {
@@ -112,7 +112,7 @@ void initStearing() {
   }
 
   Controller1.Axis2.changed(assessMovement);
-  Controller1.Axis1.changed(assessMovement);
+  Controller1.Axis3.changed(assessMovement);
 }
 
 void onStart() {
