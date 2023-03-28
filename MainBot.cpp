@@ -74,6 +74,7 @@ template < class Any >
     return val;
   }
 
+
 void MoveMotors(int pos, int pos2) {
   int a = ABS(pos) * MOVING_MULTIPLIER;
   int a2 = ABS(pos2) * MOVING_MULTIPLIER;
@@ -135,19 +136,19 @@ void stopPickup() {
 }
 
 void initPickup() {
-  Controller1.ButtonR1.pressed(spinPickupBackwards);
-  Controller1.ButtonR1.released(stopPickup);
-  Controller1.ButtonR2.pressed(spinPickupForwards);
+  Controller1.ButtonR2.pressed(spinPickupBackwards);
   Controller1.ButtonR2.released(stopPickup);
+  Controller1.ButtonR1.pressed(spinPickupForwards);
+  Controller1.ButtonR1.released(stopPickup);
 }
 
 void spinPusherForwards() {
-  Pusher.setVelocity(200, rpm);
+  Pusher.setVelocity(300, rpm);
   Pusher.spin(forward);
 }
 
 void spinPusherBackwards() {
-  Pusher.setVelocity(200, rpm);
+  Pusher.setVelocity(300, rpm);
   Pusher.spin(reverse);
 }
 void stopPusher() {
@@ -161,20 +162,23 @@ void initPusher() {
   Controller1.ButtonL2.released(stopPusher);
 }
 
-bool isSpinning = false;
+bool spinning = false;
+bool printThing = false;
+
+void stopPrinting() {
+  printThing = false;
+}
 
 void flywheel() {
-  if (isSpinning == true) {
-    Controller1.Screen.clearScreen();
+  Controller1.Screen.clearScreen();
+  if (spinning == true) {
     Flywheel_1.stop();
-    isSpinning = false;
   } else {
     Flywheel_1.spin(forward);
-    Controller1.Screen.clearScreen();
-    Controller1.Screen.print(Flywheel_1.velocity(rpm));
-    isSpinning = true;
   }
+  spinning = !spinning;
 }
+
 
 void initFlywheel() {
   Flywheel_1.setVelocity(600, rpm);
@@ -182,44 +186,27 @@ void initFlywheel() {
 }
 
 void rollerGoGoGo() {
+  Roller.setVelocity(200, rpm);
   MoveMotors(5, 5);
   Roller.spin(reverse);
 }
 
 void rollerBackBackBack() {
+  Roller.setVelocity(200, rpm);
   MoveMotors(5, 5);
   Roller.spin(forward);
 }
 
 void rollerStop() {
-  Roller.stop();
   MoveMotors(0, 0);
+  Roller.stop();
 }
 
 void initRoller() {
-  Roller.setVelocity(200, rpm);
-  Controller1.ButtonX.pressed(rollerGoGoGo);  
+  Controller1.ButtonX.pressed(rollerBackBackBack);  
   Controller1.ButtonB.pressed(rollerBackBackBack);  
   Controller1.ButtonX.released(rollerStop);
   Controller1.ButtonB.released(rollerStop);
-}
-
-void expand() {
-  Expand.spinFor(forward, 200, degrees);
-  printBrain("Expantion", false);
-}
-
-void expandCheck() {
-  int downPressed = Controller1.ButtonRight.pressing();
-  int upPressed = Controller1.ButtonLeft.pressing();
-  if (downPressed && upPressed) {
-    expand();
-  }
-}
-
-void initExpansion() {
-  Controller1.ButtonRight.pressed(expandCheck);
-  Controller1.ButtonLeft.pressed(expandCheck);
 }
 
 int main() {
@@ -229,5 +216,4 @@ int main() {
   initPusher();
   initFlywheel();
   initRoller();
-  initExpansion();
 }
