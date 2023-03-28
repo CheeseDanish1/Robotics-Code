@@ -27,24 +27,6 @@ brain Brain;
 
 
 // Robot configuration code.
-motor Motor2 = motor(PORT2, ratio18_1, false);
-
-motor Motor10 = motor(PORT10, ratio18_1, false);
-
-motor Motor11 = motor(PORT11, ratio18_1, false);
-
-motor Motor20 = motor(PORT20, ratio18_1, false);
-
-controller Controller1 = controller(primary);
-motor Roller = motor(PORT19, ratio18_1, false);
-
-motor Expand = motor(PORT3, ratio18_1, false);
-
-
-
-
-// define variable for remote controller enable/disable
-bool RemoteControlCodeEnabled = true;
 #pragma endregion VEXcode Generated Robot Configuration
 
 /*----------------------------------------------------------------------------*/
