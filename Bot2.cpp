@@ -74,7 +74,7 @@ bool RemoteControlCodeEnabled = true;
 // Include the V5 Library
 #include "vex.h"
   
-// Allows for easier use of the VEX Library
+// Allows for easier use of the  VEX Library
 using namespace vex;
 #define ABS(N)((N < 0) ? (-N) : (N))
 
@@ -111,10 +111,10 @@ void MoveMotors(int pos, int pos2) {
 void assessMovement() {
   // This is for turning (-100, 100)
   // Corresponds to x axis
-  int pos1 =  -1 * Controller1.Axis4.position();
+  int pos2 =  1 * Controller1.Axis3.position();
   // This is for speed(-100, 100)
   // Corresponds to y axis
-  int pos2 = Controller1.Axis2.position();
+  int pos1 = -1 * Controller1.Axis1.position();
 
   // Dont know why this works but im glad I found it
   MoveMotors(pos1+pos2, pos2-pos1);
@@ -130,8 +130,8 @@ void initStearing() {
     FrontLeftDrive.setStopping(brake);
   }
 
-  Controller1.Axis4.changed(assessMovement);
-  Controller1.Axis2.changed(assessMovement);
+  Controller1.Axis3.changed(assessMovement);
+  Controller1.Axis1.changed(assessMovement);
 }
 
 void onStart() {
@@ -197,8 +197,8 @@ void initWings() {
   WingRight.setStopping(brake);
   WingLeft.setStopping(brake);
 
-  WingRight.setVelocity(150, rpm);
-  WingLeft.setVelocity(150, rpm);
+  WingRight.setVelocity(200, rpm);
+  WingLeft.setVelocity(200, rpm);
 
   Controller1.ButtonL1.pressed(toggleWings);
   Controller1.ButtonL2.pressed(toggleWings);
@@ -217,15 +217,20 @@ void shootCatapult() {
   int isPressed = Controller1.ButtonY.pressing();
 
   while (isPressed) {
-    Catapult.spin(reverse);
+    Catapult.spin(reverse); 
+    wait(.77, seconds);
+    Catapult.stop();
+    wait(.3, seconds);
     printBrain(encoderAngle, true);
+    Catapult.spin(reverse);
+    wait(.3, seconds);
     
-    if (encoderAngle < -60) {
-      Catapult.stop();
-      wait(.5, seconds);
-      Catapult.spin(reverse);
-      wait(.3, seconds);
-    }
+    // if (encoderAngle < -70) {
+    //   Catapult.stop();
+    //   wait(.5, seconds);
+    //   Catapult.spin(reverse);
+    //   wait(.3, seconds);
+    // }
 
     encoderAngle = CatapultEncoder.position(degrees);
     isPressed = Controller1.ButtonY.pressing();
@@ -233,11 +238,17 @@ void shootCatapult() {
   Catapult.stop();
 } 
 
+void reverseCatapult() {
+  Catapult.spin(forward);
+}
+
 void initCatapult() {
   Catapult.setStopping(brake);
   Catapult.setVelocity(200, rpm);
   
   Controller1.ButtonY.pressed(shootCatapult);
+  Controller1.ButtonB.pressed(reverseCatapult);
+  Controller1.ButtonB.released(stopCatapult);
 }
 
 int main() {
