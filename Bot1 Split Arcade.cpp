@@ -27,26 +27,28 @@ brain Brain;
 
 
 // Robot configuration code.
-motor BackRightDrive = motor(PORT10, ratio18_1, false);
+motor FrontRightDrive = motor(PORT20, ratio18_1, false);
 
-motor BackLeftDrive = motor(PORT11, ratio18_1, false);
+motor BackRightDrive = motor(PORT19, ratio18_1, false);
 
-motor FrontRightDrive = motor(PORT2, ratio18_1, false);
+motor FrontLeftDrive = motor(PORT10, ratio18_1, false);
 
-motor FrontLeftDrive = motor(PORT20, ratio18_1, false);
-
-motor Catapult = motor(PORT15, ratio18_1, false);
-
-motor WingRight = motor(PORT4, ratio18_1, false);
-
-motor WingLeft = motor(PORT7, ratio18_1, false);
-
-motor IntakeLeft = motor(PORT18, ratio18_1, false);
-
-motor IntakeRight = motor(PORT12, ratio18_1, false);
+motor BackLeftDrive = motor(PORT9, ratio18_1, false);
 
 controller Controller1 = controller(primary);
+motor WingRight = motor(PORT6, ratio18_1, false);
+
+motor WingLeft = motor(PORT16, ratio18_1, false);
+
+motor Catapult = motor(PORT8, ratio18_1, false);
+
 encoder CatapultEncoder = encoder(Brain.ThreeWirePort.A);
+motor Intake = motor(PORT18, ratio18_1, false);
+
+motor Climb1 = motor(PORT3, ratio36_1, false);
+
+motor Climb2 = motor(PORT13, ratio18_1, false);
+
 
 
 
@@ -103,23 +105,28 @@ void MoveMotors(int pos, int pos2) {
   FrontRightDrive.setVelocity(a, rpm);
   BackLeftDrive.setVelocity(a2, rpm);
   FrontLeftDrive.setVelocity(a2, rpm);
-  BackRightDrive.spin(pos > 0 ? forward : reverse);
-  FrontRightDrive.spin(pos > 0 ? forward : reverse);
-  BackLeftDrive.spin(pos2 > 0 ? reverse : forward);
-  FrontLeftDrive.spin(pos2 > 0 ? reverse : forward);
+  BackRightDrive.spin(pos > 0 ? reverse : forward);
+  FrontRightDrive.spin(pos > 0 ? reverse : forward);
+  BackLeftDrive.spin(pos2 > 0 ? forward : reverse);
+  FrontLeftDrive.spin(pos2 > 0 ? forward : reverse);
 }
 
 
 void assessMovement() {
   // This is for turning (-100, 100)
   // Corresponds to x axis
-  int pos1 = Controller1.Axis3.position();
+  // int pos1 = Controller1.Axis3.position();
   // This is for speed(-100, 100)
   // Corresponds to y axis
-  int pos2 = Controller1.Axis2.position();
+  // int pos2 = Controller1.Axis2.position();
+
+    int pos1 = -1 * Controller1.Axis1.position();
+  int pos2 = Controller1.Axis3.position();
+
 
   // Dont know why this works but im glad I found it
-  MoveMotors(pos1, pos2);
+  MoveMotors(pos2 - pos1, pos1+pos2);
+  // MoveMotors(pos1, pos2);
 }
 
 void initStearing() {
@@ -132,41 +139,13 @@ void initStearing() {
     FrontLeftDrive.setStopping(brake);
   }
 
+  Controller1.Axis1.changed(assessMovement);
   Controller1.Axis3.changed(assessMovement);
-  Controller1.Axis2.changed(assessMovement);
 }
 
 void onStart() {
   printBrain("Hewwo UwU :3", true);
   Controller1.rumble(rumblePulse);
-}
-
-void intakeForward() {
-  IntakeLeft.spin(forward);
-  IntakeRight.spin(reverse);
-}
-
-void intakeReverse() {
-  IntakeLeft.spin(reverse);
-  IntakeRight.spin(forward);
-}
-
-void intakeStop() {
-  IntakeLeft.stop();
-  IntakeRight.stop();
-}
-
-void initIntake() {
-  IntakeLeft.setStopping(brake);
-  IntakeRight.setStopping(brake);
-
-  IntakeLeft.setVelocity(200, rpm);
-  IntakeRight.setVelocity(200, rpm);
-
-  Controller1.ButtonR1.pressed(intakeReverse);
-  Controller1.ButtonR2.pressed(intakeForward);
-  Controller1.ButtonR2.released(intakeStop);
-  Controller1.ButtonR1.released(intakeStop);
 }
 
 bool WingsOpen = false;
@@ -175,7 +154,7 @@ void openWings() {
   WingRight.spin(reverse);
   WingLeft.spin(forward);
 
-  wait(.29, seconds);
+  wait(.6, seconds);
 
   WingRight.stop();
   WingLeft.stop();
@@ -185,12 +164,10 @@ void closeWings() {
   WingRight.spin(forward);
   WingLeft.spin(reverse);
 
-  wait(.35, seconds);
+  wait(.5, seconds);
 
   WingRight.stop();
   WingLeft.stop();
-  // WingRight.spinFor(forward, 180, degrees);
-  // WingLeft.spinFor(reverse, 180, degrees);
 }
 
 void toggleWings() {
@@ -204,18 +181,15 @@ void initWings() {
   WingRight.setStopping(brake);
   WingLeft.setStopping(brake);
 
-  WingRight.setVelocity(150, rpm);
-  WingLeft.setVelocity(150, rpm);
+  WingRight.setVelocity(200, rpm);
+  WingLeft.setVelocity(200, rpm);
 
-  Controller1.ButtonA.pressed(toggleWings);
-
-  // Controller1.ButtonR2.pressed(openWings);
-  // Controller1.ButtonL2.pressed(closeWings);
+  Controller1.ButtonL1.pressed(toggleWings);
+  Controller1.ButtonL2.pressed(toggleWings);
 }
 
 void stopCatapult() {
   Catapult.stop();
-  IntakeLeft.stop();
 }
 
 void shootCatapult() {
@@ -246,27 +220,62 @@ void initCatapult() {
   Controller1.ButtonY.pressed(shootCatapult);
 }
 
-int main() {
-  onStart();
-  initStearing();
-  initWings();
-  initIntake();
-  initCatapult();
+void stopSpinning() {
+  Intake.stop();
 }
 
-/* *************WIRING*************
+void spinIn() {
+  Intake.spin(forward);
+}
 
-BACK RIGHT DRIVE: PORT 10
-BACK LEFT DRIVE: PORT 11
-FRONT RIGHT DRIVE: PORT 2
-FRONT LEFT DRIVE: PORT 20
+void spinOut() {
+  Intake.spin(reverse);
+}
 
-CATAPULT: PORT 15
+void initIntake() {
+  Intake.setVelocity(200, rpm);
 
-RIGHT WING: PORT 4
-LEFT WING: PORT 7
+  Controller1.ButtonR2.pressed(spinIn);
+  Controller1.ButtonR1.pressed(spinOut);
+  Controller1.ButtonR2.released(stopSpinning);
+  Controller1.ButtonR1.released(stopSpinning);
+}
 
-LEFT INTAKE: PORT 18
-RIGHT INTAKE: PORT 12
+void lowerClimb() {
+  Climb1.spin(forward);
+  Climb2.spin(reverse);
+}
 
-*/
+void raiseClimb() {
+  Climb1.spin(reverse);
+  Climb2.spin(forward);
+}
+
+void stopClimb() {
+  Climb1.stop();
+  Climb2.stop();
+}
+
+void initClimb() {
+  Climb1.setVelocity(100, rpm);
+  Climb2.setVelocity(100, rpm);
+  Climb1.setMaxTorque(100, percent);
+  Climb2.setMaxTorque(100, percent);
+
+  // Climb1.setStopping(brake);
+  // Climb2.setStopping(brake);
+
+  // Controller1.ButtonUp.pressed(raiseClimb);
+  Controller1.ButtonA.pressed(lowerClimb);
+  Controller1.ButtonA.released(stopClimb);
+  // Controller1.ButtonUp.released(stopClimb);
+}
+
+int main() {
+  onStart();
+  initClimb();
+  initStearing();
+  initWings();
+  initCatapult();
+  initIntake();
+}
