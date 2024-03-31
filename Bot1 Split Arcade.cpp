@@ -271,6 +271,23 @@ void initClimb() {
   // Controller1.ButtonUp.released(stopClimb);
 }
 
+void initStartSeq2() {
+  // Drop intake and raise climb a little
+
+  Intake.spin(reverse);
+  Climb1.spin(forward);
+  Climb2.spin(reverse);
+  wait(.1, seconds);
+  Intake.stop();
+  wait(.5, seconds);
+  Climb1.stop();
+  Climb2.stop();
+}
+
+void initStartSeq() {
+  Controller1.ButtonB.pressed(initStartSeq2);
+}
+
 int main() {
   onStart();
   initClimb();
@@ -278,4 +295,22 @@ int main() {
   initWings();
   initCatapult();
   initIntake();
+  initStartSeq();
 }
+
+/* *************WIRING*************
+
+BACK RIGHT DRIVE: PORT 10
+BACK LEFT DRIVE: PORT 11
+FRONT RIGHT DRIVE: PORT 2
+FRONT LEFT DRIVE: PORT 20
+
+CATAPULT: PORT 15
+
+RIGHT WING: PORT 4
+LEFT WING: PORT 7
+
+LEFT INTAKE: PORT 18
+RIGHT INTAKE: PORT 12
+
+*/
